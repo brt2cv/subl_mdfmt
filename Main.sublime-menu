@@ -1,0 +1,29 @@
+[
+    {
+        "caption": "MdTools",
+        "children": [
+            {
+                "caption": "格式化文档",
+                "command": "md_format"
+            },
+            {
+                "caption": "更新标题序号",
+                "command": "open_file",
+                "args": {
+                    "file": "${packages}/subl_imgpaste2/imgpaste2.sublime-settings"
+                },
+            },
+            {
+                "caption": "设置图片格式",
+                "children": [
+                    {
+                        "caption": "同级子目录/img.jpg"
+                    },
+                    {
+                        "caption": "文档内嵌Base64图像"
+                    }
+                ]
+            },
+        ]
+    }
+]

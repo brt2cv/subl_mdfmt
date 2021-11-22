@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# @Date    : 2020-05-23
+# @Date    : 2021-11-22
 # @Author  : Bright Li (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
-# @Version : 0.1.2
+# @Version : 0.1.3
 
 import os.path
 import re
@@ -83,6 +83,10 @@ class MarkdownParser:
     def insert_text(self, index, content):
         self.check_lock()
         self.__text_lines.insert(index, self._set_line(content))
+
+    def append_text(self, content):
+        self.check_lock()
+        self.__text_lines.append(self._set_line(content))
 
     def pop_text(self, index):
         self.check_lock()

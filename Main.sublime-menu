@@ -4,17 +4,13 @@
         "children": [
             {
                 "caption": "格式化文档",
-                "command": "md_format"
-            },
-            {
-                "caption": "更新标题序号",
-                "command": "open_file",
+                "command": "md_format",
                 "args": {
-                    "file": "${packages}/subl_imgpaste2/imgpaste2.sublime-settings"
-                },
+                    "type": "doc_format"
+                }
             },
             {
-                "caption": "设置图片格式",
+                "caption": "设置图片格式（NotImplement）",
                 "children": [
                     {
                         "caption": "同级子目录/img.jpg"
@@ -24,6 +20,13 @@
                     }
                 ]
             },
+            {
+                "caption": "图片格式化: img -> base64",
+                "command": "md_format",
+                "args": {
+                    "type": "img2base64"
+                }
+            }
         ]
     }
 ]

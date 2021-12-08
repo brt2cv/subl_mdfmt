@@ -1,12 +1,27 @@
 [
     {
         "caption": "MdTools",
+        "id": "L",
         "children": [
             {
                 "caption": "格式化文档",
                 "command": "md_format",
                 "args": {
                     "type": "doc_format"
+                }
+            },
+            {
+                "caption": "将更新文件添加到上传列表",
+                "command": "md_format",
+                "args": {
+                    "type": "upload_prepare"
+                }
+            },
+            {
+                "caption": "上传至博客",
+                "command": "md_format",
+                "args": {
+                    "type": "upload"
                 }
             },
             {

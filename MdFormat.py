@@ -8,16 +8,26 @@
 import sublime
 import sublime_plugin
 
+import sys
 import os.path
+import subprocess
+
 from base64 import b64encode
 from hashlib import md5
 from datetime import datetime
 
-from .fmt_md import MarkdownFormatter
+from .formatter.md_fmt import MarkdownFormatter
+
+def subproc_run(command):
+    # command = ['python3', os.path.join(dirname, 'bin/clipboard.py')]
+    # str_cmd = " ".join(command)
+    return subprocess.Popen(command,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE)
+                            # stderr=subprocess.STDOUT)
 
 class NotSavedFile(Exception): pass
 class NotMarkdownFile(Exception): pass
-
 
 def get_categories(path_md, key_dirname):
     assert os.path.isabs(path_md)
@@ -32,8 +42,6 @@ def get_categories(path_md, key_dirname):
     index = path_parts.index(key_dirname)
     return list(path_parts[index +1:])
 
-dir_blog = "programming"
-
 class MdFormatCommand(sublime_plugin.TextCommand):
 
     fmt = MarkdownFormatter()
@@ -41,9 +49,11 @@ class MdFormatCommand(sublime_plugin.TextCommand):
     def __init__(self, *args, **kwgs):
         super().__init__(*args, **kwgs)
         # print(">>> 初始化MdFormatCommand")
-        # self.settings = sublime.load_settings('imgpaste2.sublime-settings')
+        self.settings = sublime.load_settings('settings.sublime-settings')
         self.type2method = {
             "doc_format": self.doc_format,
+            "upload_prepare": self.upload_prepare,
+            "upload": self.upload,
             "img2base64": self.img2base64
         }
 
@@ -69,10 +79,30 @@ class MdFormatCommand(sublime_plugin.TextCommand):
         self._reload_doc()
 
         # 传入文档路径的list，作为category
-        self.fmt.metadata['categories'] = get_categories(self.fmt.file_path, dir_blog)
-
+        self.fmt.metadata['categories'] = get_categories(self.fmt.file_path,
+                                          self.settings.get("blog_dir_name", ""))
         self.fmt.format()
         self.fmt.overwrite()
+
+    def upload_prepare(self, edit):
+        # get note dir
+        dir_note = self.settings.get("note_dir")
+        dir_note = os.path.expanduser(dir_note)
+        # popen main.py
+        print(">>>", os.path.join(dir_note, 'tools/upload_cnblog/main.py'))
+        proc = subproc_run(['python', os.path.join(dir_note, 'tools/main.py'), "-c"])
+        bytes_state = proc.stdout.readline()  # bytes
+        if bytes_state:
+            sublime.error_message("[Error] {}".format(bytes_state))
+
+    def upload(self, edit):
+        # get note dir
+        dir_note = self.settings.get("note_dir")
+        # popen main.py
+        proc = subproc_run(['python', os.path.join(dir_note, 'tools/main.py'), "-p"])
+        bytes_state = proc.stdout.readline()  # bytes
+        if bytes_state:
+            sublime.error_message("[Error] {}".format(bytes_state))
 
     def img2base64(self, edit):
         self._reload_doc()

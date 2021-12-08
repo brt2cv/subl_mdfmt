@@ -10,7 +10,7 @@ import datetime
 import glob
 from collections import defaultdict
 
-from .doc_parser import MarkdownParser, NullMarkdownFile
+from .md_parser import MarkdownParser, NullMarkdownFile
 from .util.imgfmt import png2jpg, resize
 
 

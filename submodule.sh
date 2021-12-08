@@ -56,9 +56,11 @@ url_repo=$2
 branch=$3
 
     if [ -d $dir_module ]; then
-        cd $dir_module && git checkout $branch && git pull && cd ..
+        git submodule init
+        git submodule update
+        # cd $dir_module && git checkout $branch && git pull && cd ..
         # git submodule foreach git pull
-            echo ">> 子模块已更新，请在主仓库commit子模块引用信息"
+        echo ">> 子模块已更新，请在主仓库add子模块引用信息"
     else
         read -p "是否载入子模块 [y/N]" continue
         if [ ${continue}_ == "y_" ]; then

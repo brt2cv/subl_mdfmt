@@ -1,0 +1,3 @@
+[submodule "cnblog"]
+	path = cnblog
+	url = https://github.com/brt2cv/note2cnblog.git

@@ -17,6 +17,8 @@ from hashlib import md5
 from datetime import datetime
 
 from .formatter.md_fmt import MarkdownFormatter
+from .cnblog.cnblog import CnblogManager, get_categories
+from .cnblog.main import NoteRepoMgr
 
 def subproc_run(command):
     # command = ['python3', os.path.join(dirname, 'bin/clipboard.py')]
@@ -28,19 +30,7 @@ def subproc_run(command):
 
 class NotSavedFile(Exception): pass
 class NotMarkdownFile(Exception): pass
-
-def get_categories(path_md, key_dirname):
-    assert os.path.isabs(path_md)
-    # assert path_md.find(os.path.abspath(self.db_mgr.repo_dir)) == 0
-
-    # 通过相对路径
-    # path_dir = Path(os.path.dirname(path_md)).as_posix()
-    # path_parts = Path(os.path.dirname(path_md)).parts  # tuple
-    path_parts = os.path.dirname(path_md).split(os.sep)
-
-    assert key_dirname in path_parts, "Error: {} not in {}".format(key_dirname, path_parts)
-    index = path_parts.index(key_dirname)
-    return list(path_parts[index +1:])
+class NotUpdateLatest(Exception): pass
 
 class MdFormatCommand(sublime_plugin.TextCommand):
 
@@ -56,6 +46,13 @@ class MdFormatCommand(sublime_plugin.TextCommand):
             "upload": self.upload,
             "img2base64": self.img2base64
         }
+        self.cnblog_init()
+
+    def cnblog_init(self):
+        path_curr = os.path.abspath(__file__)
+        path_cnblog_account = os.path.join(os.path.dirname(path_curr), ".cnblog.json")
+        cnblog_mgr = CnblogManager(path_cnblog_account)
+        self.note_mgr = NoteRepoMgr(cnblog_mgr)
 
     def run(self, edit, type):
         self.type2method[type](edit)
@@ -85,24 +82,12 @@ class MdFormatCommand(sublime_plugin.TextCommand):
         self.fmt.overwrite()
 
     def upload_prepare(self, edit):
-        # get note dir
-        dir_note = self.settings.get("note_dir")
-        dir_note = os.path.expanduser(dir_note)
-        # popen main.py
-        print(">>>", os.path.join(dir_note, 'tools/upload_cnblog/main.py'))
-        proc = subproc_run(['python', os.path.join(dir_note, 'tools/main.py'), "-c"])
-        bytes_state = proc.stdout.readline()  # bytes
-        if bytes_state:
-            sublime.error_message("[Error] {}".format(bytes_state))
+        self.note_mgr.commit_repo()
 
     def upload(self, edit):
-        # get note dir
-        dir_note = self.settings.get("note_dir")
-        # popen main.py
-        proc = subproc_run(['python', os.path.join(dir_note, 'tools/main.py'), "-p"])
-        bytes_state = proc.stdout.readline()  # bytes
-        if bytes_state:
-            sublime.error_message("[Error] {}".format(bytes_state))
+        if not sublime.ok_cancel_dialog("请确认当前仓库已经pull至最新版本"):
+            raise NotUpdateLatest()
+        self.note_mgr.push()
 
     def img2base64(self, edit):
         self._reload_doc()

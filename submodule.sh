@@ -93,7 +93,7 @@ if [ $action == "push" ]; then
     # subtree_push data $m_cnblog master
 
     # submodule
-    submodule_push cnblog $m_cnblog master
+    submodule_push cnblog $m_cnblog sublime
 
     # 子项目
     # echo "如需推送，请直接到子仓库中执行 `git push`"
@@ -103,7 +103,7 @@ elif [ $action == "pull" ]; then
     # subtree_pull data $m_cnblog master
 
     # submodule
-    submodule_pull cnblog $m_cnblog master
+    submodule_pull cnblog $m_cnblog sublime
 
     # 子项目
     # clone_or_pull etc $m_etc master

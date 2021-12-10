@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# @Date    : 2021-11-18
+# @Date    : 2021-12-09
 # @Author  : Bright Li (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
-# @Version : 0.0.3
+# @Version : 0.0.4
 
 import os
 import re
@@ -42,9 +42,9 @@ class MarkdownFormatter(MarkdownParser):
         if self.check_list["index_H1"]:
             self.pop_text(self.check_list["index_H1"])
 
-        self.update_meta()
-
         self.update_serial_num()
+        self.update_description()
+        self.update_meta()
 
         # # 图像处理
         # if self.get_images("http") and input("是否尝试下载超链接图片？[Y/n]: ").lower() != "n":
@@ -129,11 +129,17 @@ keywords    = {}
             prefix, _, text = re.match(pattern_headline, line).groups()
             return "{} {} {}".format(prefix, serial_num, text)
 
+        self.head2 = []
         for index, line in enumerate(self.get_text()):
             if line.startswith("## "):
                 x += 1
                 y,z = 0,0
-                self.modify_text(index, update_line(line))
+
+                new_line = update_line(line)
+                self.modify_text(index, new_line)
+                # h2 = re.match(pattern_headline, line).groups()[2]
+                _, h2 = new_line.split(maxsplit=1)
+                self.head2.append(h2)
             elif line.startswith("### "):
                 y += 1
                 z = 0
@@ -141,6 +147,10 @@ keywords    = {}
             elif line.startswith("#### "):
                 z += 1
                 self.modify_text(index, update_line(line))
+
+    def update_description(self):
+        if not self.metadata['description']:
+            self.metadata['description'] = "; ".join(self.head2)
 
     def download_img(self):
         from util.imgfmt import download_src

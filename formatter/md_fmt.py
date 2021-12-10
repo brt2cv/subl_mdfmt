@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# @Date    : 2021-12-09
+# @Date    : 2021-12-10
 # @Author  : Bright Li (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
-# @Version : 0.0.4
+# @Version : 0.1.4
 
 import os
 import re
@@ -44,7 +44,7 @@ class MarkdownFormatter(MarkdownParser):
 
         self.update_serial_num()
         self.update_description()
-        self.update_meta()
+        self.update_meta()  # Front Matter
 
         # # 图像处理
         # if self.get_images("http") and input("是否尝试下载超链接图片？[Y/n]: ").lower() != "n":
@@ -66,7 +66,7 @@ class MarkdownFormatter(MarkdownParser):
             fp.writelines(self.get_text())
         # print(f"Markdown文件已保存【{self.file_path}】")
 
-    def _make_meta_line(self):
+    def _make_front_matter(self):
         def list_as_str(data: list):
             # str(data) -> 单引号，不符合markdown标准
             return "[\"" + "\",\"".join(data) + "\"]" if data else "[]"
@@ -91,7 +91,7 @@ keywords    = {}
         return str_md_info
 
     def update_meta(self):
-        meta_line = self._make_meta_line()
+        meta_line = self._make_front_matter()
         if self.meta_range[0] is not None:
         # def _remove_old_meta(self):
             __text_lines = self.get_text()

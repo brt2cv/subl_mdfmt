@@ -41,6 +41,7 @@ class MarkdownParser:
         self.file_path = ""
         self.__text_lines = []
         self.__text_lock = False
+        # Front Matter
         self.metadata = {
             "title": "",
             "description": "",

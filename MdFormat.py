@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# @Date    : 2021-12-02
+# @Date    : 2021-12-19
 # @Author  : Bright (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
 
@@ -8,7 +8,6 @@
 import sublime
 import sublime_plugin
 
-import sys
 import os.path
 import subprocess
 
@@ -31,6 +30,7 @@ def subproc_run(command):
 class NotSavedFile(Exception): pass
 class NotMarkdownFile(Exception): pass
 class NotUpdateLatest(Exception): pass
+class NoConfigFile(Exception): pass
 
 class MdFormatCommand(sublime_plugin.TextCommand):
 
@@ -51,6 +51,9 @@ class MdFormatCommand(sublime_plugin.TextCommand):
     def cnblog_init(self):
         path_curr = os.path.abspath(__file__)
         path_cnblog_account = os.path.join(os.path.dirname(path_curr), ".cnblog.json")
+        if not os.path.exists(path_cnblog_account):
+            sublime.error_message("【MdTools】插件未找到配置文件.cnblog.json")
+            raise NoConfigFile()
         cnblog_mgr = CnblogManager(path_cnblog_account)
         self.note_mgr = NoteRepoMgr(cnblog_mgr)
 

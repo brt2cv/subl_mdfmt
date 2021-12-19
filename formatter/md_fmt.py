@@ -79,15 +79,18 @@ class MarkdownFormatter(MarkdownParser):
 title       = "{}"
 description = "{}"
 date        = "{}"
-weight      = {}
 tags        = {}
 categories  = {}
+series      = {}
 keywords    = {}
+weight      = {}
+toc         = true
+draft       = false
 +++ -->
-""".format(self.metadata['title'], self.metadata['description'],
-    self.metadata['date'], self.metadata['weight'], list_as_str(self.metadata.get('tags')),
-    list_as_str(self.metadata.get('categories')), list_as_str(self.metadata.get('keywords'))
-    )
+""".format(self.metadata['title'], self.metadata['description'], self.metadata['date'],
+    list_as_str(self.metadata.get('tags')), list_as_str(self.metadata.get('categories')),
+    list_as_str(self.metadata.get('series')), list_as_str(self.metadata.get('keywords')),
+    self.metadata['weight'])
         return str_md_info
 
     def update_meta(self):

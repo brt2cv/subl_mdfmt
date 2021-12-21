@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# @Date    : 2021-12-10
+# @Date    : 2021-12-21
 # @Author  : Bright Li (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
-# @Version : 0.1.4
+# @Version : 0.1.5
 
 import os
 import re
@@ -11,22 +11,21 @@ import glob
 from collections import defaultdict
 
 from .md_parser import MarkdownParser, NullMarkdownFile
-from .util.imgfmt import png2jpg, resize
+# from .util.imgfmt import png2jpg, resize
 
+# def png2jpg_for_md(path_png):
+#     """ 验证png转换后体积明显缩小，
+#         否则添加前缀，避免修改后再次上传时重复进行格式转换 """
+#     new_file_prefix="keepng_"
+#     if os.path.basename(path_png).startswith(new_file_prefix):
+#         return path_png
 
-def png2jpg_for_md(path_png):
-    """ 验证png转换后体积明显缩小，
-        否则添加前缀，避免修改后再次上传时重复进行格式转换 """
-    new_file_prefix="keepng_"
-    if os.path.basename(path_png).startswith(new_file_prefix):
-        return path_png
-
-    path_jpg = png2jpg(path_png, 85)
-    if path_jpg == path_png:
-        path_jpg = os.path.join(os.path.dirname(path_png),
-           new_file_prefix + os.path.basename(path_png))
-        os.rename(path_png, path_jpg)
-    return path_jpg
+#     path_jpg = png2jpg(path_png, 85)
+#     if path_jpg == path_png:
+#         path_jpg = os.path.join(os.path.dirname(path_png),
+#            new_file_prefix + os.path.basename(path_png))
+#         os.rename(path_png, path_jpg)
+#     return path_jpg
 
 class MarkdownFormatter(MarkdownParser):
 
@@ -37,7 +36,7 @@ class MarkdownFormatter(MarkdownParser):
             toc_index = self.check_list["index_H2"]
             if toc_index is None:
                 toc_index = 0
-            self.insert_text(toc_index, "[TOC]\n\n")
+            self.insert_text(toc_index, "[TOC]\n\n---\n\n")
 
         if self.check_list["index_H1"]:
             self.pop_text(self.check_list["index_H1"])

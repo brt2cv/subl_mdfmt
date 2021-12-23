@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# @Date    : 2021-12-19
+# @Date    : 2021-12-23
 # @Author  : Bright (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
 
@@ -14,6 +14,7 @@ import subprocess
 from base64 import b64encode
 from hashlib import md5
 from datetime import datetime
+from urllib.request import urlopen
 
 from .formatter.md_fmt import MarkdownFormatter
 from .cnblog.cnblog import CnblogManager, get_categories
@@ -26,6 +27,14 @@ def subproc_run(command):
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE)
                             # stderr=subprocess.STDOUT)
+
+def md5sum(data, salt=None):
+    if salt is None:
+        salt = str(datetime.now()).encode()
+
+    md5obj = md5(salt)
+    md5obj.update(data)
+    return md5obj.hexdigest()
 
 class NotSavedFile(Exception): pass
 class NotMarkdownFile(Exception): pass
@@ -94,23 +103,34 @@ class MdFormatCommand(sublime_plugin.TextCommand):
 
     def img2base64(self, edit):
         self._reload_doc()
-        dict_images = self.fmt.get_images("local")
 
+        dict_images = self.fmt.get_images("local")
         # self.fmt.process_images(dict_images, lambda xxx: pass)
         self.fmt.unlock_text()
-
-        for line_idx, url_img in dict_images.items():
-            url_new = (url_img)
-            with open(url_img, "rb") as fp:
+        for line_idx, path_img in dict_images.items():
+            with open(path_img, "rb") as fp:
                 img_buff = fp.read()
                 img_base64 = b64encode(img_buff)  # bytes
 
-                salt = str(datetime.now()).encode()
-                md5obj = md5(salt)
-                md5obj.update(img_buff)
-                tmp_label = md5obj.hexdigest()
-
+            tmp_label = md5sum(img_buff[:70])
             num_space = self.fmt.get_text()[line_idx].find("!")
-            self.fmt.modify_text(line_idx, " "*num_space + "![][%s]" % tmp_label)
-            self.fmt.append_text("\n\n[%s]:data:image/png;base64,%s" % (tmp_label, img_base64.decode()))
+            indent = " "*num_space
+            self.fmt.modify_text(line_idx, "{}[{}]:data:image/png;base64,{}\n{}![][{}]".format(
+                    indent, tmp_label, img_base64.decode(), indent, tmp_label
+                ))
+
+        dict_images = self.fmt.get_images("http")
+        self.fmt.unlock_text()
+        for line_idx, url_img in dict_images.items():
+            resp = urlopen(url_img)
+            img_buff = resp.read()
+            img_base64 = b64encode(img_buff)  # bytes
+
+            tmp_label = md5sum(img_buff[:70])
+            num_space = self.fmt.get_text()[line_idx].find("!")
+            indent = " "*num_space
+            self.fmt.modify_text(line_idx, "{}[{}]:data:image/png;base64,{}\n{}![][{}]".format(
+                    indent, tmp_label, img_base64.decode(), indent, tmp_label
+                ))
+
         self.fmt.overwrite()

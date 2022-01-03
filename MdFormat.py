@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# @Date    : 2021-12-23
+# @Date    : 2022-01-03
 # @Author  : Bright (brt2@qq.com)
 # @Link    : https://gitee.com/brt2
+# @Version : v0.2.1
 
 # https://www.sublimetext.com/docs/api_reference.html
 
@@ -10,6 +11,7 @@ import sublime_plugin
 
 import os.path
 import subprocess
+from threading import Thread
 
 from base64 import b64encode
 from hashlib import md5
@@ -99,7 +101,8 @@ class MdFormatCommand(sublime_plugin.TextCommand):
     def upload(self, edit):
         if not sublime.ok_cancel_dialog("请确认当前仓库已经pull至最新版本"):
             raise NotUpdateLatest()
-        self.note_mgr.push()
+        tid = Thread(target=self.note_mgr.push)
+        tid.start()
 
     def img2base64(self, edit):
         self._reload_doc()

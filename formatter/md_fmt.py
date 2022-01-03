@@ -60,11 +60,6 @@ class MarkdownFormatter(MarkdownParser):
         # # 判断下载图像的size，执行resize或压缩
         # self.compress_bigimg()
 
-    def overwrite(self):
-        with open(self.file_path, "w", encoding="utf8") as fp:
-            fp.writelines(self.get_text())
-        # print(f"Markdown文件已保存【{self.file_path}】")
-
     def _make_front_matter(self):
         def list_as_str(data: list):
             # str(data) -> 单引号，不符合markdown标准

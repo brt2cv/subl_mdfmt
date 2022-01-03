@@ -1,0 +1,7 @@
+[
+    {
+        "keys": ["shift+alt+m"],
+        "command": "md_format",
+        "args": { "type": "doc_format" }
+    }
+]
